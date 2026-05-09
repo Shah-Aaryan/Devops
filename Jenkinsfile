@@ -32,7 +32,7 @@ pipeline {
         stage('Git: Code Checkout') {
             steps {
                 script{
-                    code_checkout("https://github.com/alisameed32/playback-space.git","devops")
+                    code_checkout("https://github.com/Shah-Aaryan/Devops.git","devops")
                 }
             }
         }
