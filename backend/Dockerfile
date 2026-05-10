@@ -1,5 +1,5 @@
-# Stage 1: Build & Test
-FROM node:20 AS backend-builder
+# Stage 1: Build
+FROM node:20-slim AS backend-builder
 
 # Setup the working dir
 WORKDIR /app
@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install packages
-RUN npm install
+RUN npm ci
 
 # Copy the rest of the code
 COPY . .
@@ -17,13 +17,17 @@ COPY . .
 #RUN npm run test
 
 # Stage 2: Production Image
-FROM node:21-slim
+FROM node:20-slim
+ENV NODE_ENV=production
 
 # Setup the working dir
 WORKDIR /app
 
 # Copy only the necessary files from the builder stage to keep the image lean
 COPY --from=backend-builder /app .
+
+# Remove dev dependencies to keep the image smaller
+RUN npm prune --omit=dev
 
 # Expose the port the app runs on
 EXPOSE 8000 

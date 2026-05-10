@@ -32,8 +32,15 @@ rm minikube-linux-amd64
 # Start minikube as ubuntu user
 sudo -u ubuntu minikube start --driver=docker --cpus=2 --memory=4096
 
-echo "=== [5/5] Installing Helm ==="
+echo "=== [5/6] Installing Helm ==="
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+echo "=== [6/6] Starting Prometheus + Grafana stack ==="
+if [ ! -d "/home/ubuntu/Devops" ]; then
+	git clone https://github.com/Shah-Aaryan/Devops.git /home/ubuntu/Devops
+fi
+cd /home/ubuntu/Devops
+docker compose up -d prometheus grafana node-exporter alertmanager
 
 echo ""
 echo "============================================================"

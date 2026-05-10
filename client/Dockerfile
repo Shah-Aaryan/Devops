@@ -1,26 +1,21 @@
 # Stage 1: Build the client application
 FROM node:20-slim AS client-builder
-# Set the working directory
 WORKDIR /app
 
 # Copy package.json and package-lock.json to install dependencies
 COPY package*.json ./
-
-# Install dependencies
-RUN npm install
+RUN npm ci
 
 # Copy the rest of the application code
 COPY . .
+RUN npm run build
 
-# Build the application for production
-FROM node:20-slim
-WORKDIR /app
+# Stage 2: Production image (Nginx)
+FROM nginx:1.27-alpine
+ENV API_UPSTREAM=http://backend:8000
 
-# Copy the built application from the client-builder stage
-COPY --from=client-builder /app .
+# Serve static assets and proxy API requests
+COPY --from=client-builder /app/dist /usr/share/nginx/html
+COPY nginx.conf.template /etc/nginx/templates/default.conf.template
 
-# Expose the port that the Vite development server will run on
-EXPOSE 5173
-
-# Start the Vite development server
-CMD ["npm", "run", "dev", "--", "--host"]
+EXPOSE 80

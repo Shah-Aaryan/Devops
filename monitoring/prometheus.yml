@@ -25,5 +25,5 @@ scrape_configs:
   # Add prom-client to backend and expose /metrics to enable this
   - job_name: 'playback-backend'
     static_configs:
-      - targets: ['backend:8000']
+      - targets: ['host.docker.internal:31100']
     metrics_path: '/metrics'

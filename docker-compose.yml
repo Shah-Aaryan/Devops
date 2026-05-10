@@ -16,10 +16,10 @@ services:
   client:
     container_name: client
     build: ./client
-    env_file:
-      - ./client/.env
+    environment:
+      - API_UPSTREAM=http://backend:8000
     ports:
-      - "5173:5173"
+      - "5173:80"
     depends_on:
       - backend
     networks:
@@ -34,6 +34,8 @@ services:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./monitoring/alert.rules.yml:/etc/prometheus/alert.rules.yml:ro
       - prometheus_data:/prometheus
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
