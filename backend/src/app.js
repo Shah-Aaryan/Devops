@@ -19,7 +19,7 @@ register.registerMetric(httpRequestDurationSeconds);
 
 app.use(
   cors({
-    origin: "http://13.236.92.223:5173",
+    origin: "http://13.239.176.14:5173",
     credentials: true,
   })
 );
