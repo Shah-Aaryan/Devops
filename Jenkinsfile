@@ -13,6 +13,15 @@ pipeline {
                 }
             }
         }
+
+        stage("Set Image Tags") {
+            steps {
+                script {
+                    env.CLIENT_TAG = params.CLIENT_DOCKER_TAG?.trim() ? params.CLIENT_DOCKER_TAG.trim() : "latest"
+                    env.BACKEND_TAG = params.BACKEND_DOCKER_TAG?.trim() ? params.BACKEND_DOCKER_TAG.trim() : "latest"
+                }
+            }
+        }
         
         stage('Git: Code Checkout') {
             steps {
@@ -41,12 +50,12 @@ pipeline {
             steps{
                 dir('backend'){
                     sh """
-                        docker build -t alisameed/playback-space-backend-beta:${params.BACKEND_DOCKER_TAG} .
+                        docker build -t alisameed/playback-space-backend-beta:${env.BACKEND_TAG} .
                     """
                 }
                 dir('client'){
                     sh """
-                        docker build -t alisameed/playback-space-client-beta:${params.CLIENT_DOCKER_TAG} .
+                        docker build -t alisameed/playback-space-client-beta:${env.CLIENT_TAG} .
                     """
                 }
             }
