@@ -6,15 +6,6 @@ pipeline {
     }
     
     stages {
-        stage("Validate Parameters") {
-            steps {
-                script {
-                    if (params.CLIENT_DOCKER_TAG == '' || params.BACKEND_DOCKER_TAG == '') {
-                        error("CLIENT_DOCKER_TAG and BACKEND_DOCKER_TAG must be provided.")
-                    }
-                }
-            }
-        }
         stage("Workspace cleanup"){
             steps{
                 script{
