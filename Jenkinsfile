@@ -48,23 +48,15 @@ pipeline {
 
         stage("Docker: Build Images"){
             steps{
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-cred',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-                    dir('backend'){
-                        sh """
-                            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                            docker build -t alisameed/playback-space-backend-beta:${params.BACKEND_DOCKER_TAG} .
-                        """
-                    }
-                    dir('client'){
-                        sh """
-                            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                            docker build -t alisameed/playback-space-client-beta:${params.CLIENT_DOCKER_TAG} .
-                        """
-                    }
+                dir('backend'){
+                    sh """
+                        docker build -t alisameed/playback-space-backend-beta:${params.BACKEND_DOCKER_TAG} .
+                    """
+                }
+                dir('client'){
+                    sh """
+                        docker build -t alisameed/playback-space-client-beta:${params.CLIENT_DOCKER_TAG} .
+                    """
                 }
             }
         }
