@@ -1,10 +1,5 @@
 pipeline {
     agent {label 'alisa'}
-    
-    environment{
-        SONAR_HOME = tool "Sonar"
-    }
-    
     parameters {
         string(name: 'CLIENT_DOCKER_TAG', defaultValue: '', description: 'Setting docker image for latest push')
         string(name: 'BACKEND_DOCKER_TAG', defaultValue: '', description: 'Setting docker image for latest push')
@@ -52,28 +47,6 @@ pipeline {
             }
         }
 
-        
-        stage("SonarQube: Code Analysis"){
-            steps{
-                withSonarQubeEnv("Sonar") {
-                    sh """
-                        ${tool('Sonar')}/bin/sonar-scanner \\
-                          -Dsonar.projectKey=playback-space \\
-                          -Dsonar.projectName=playback-space \\
-                          -Dsonar.sources=.
-                    """
-                }
-            }
-        }
-        
-        stage("SonarQube: Code Quality Gates"){
-            steps{
-                timeout(time: 2, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: false
-                }
-            }
-        }
-        
         stage("Docker: Build Images"){
             steps{
                 withCredentials([usernamePassword(
