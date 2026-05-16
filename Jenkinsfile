@@ -26,10 +26,9 @@ pipeline {
         stage('Git: Code Checkout') {
             steps {
                 checkout([$class: 'GitSCM',
-                    branches: [[name: "*/devops"]],
+                    branches: [[name: "*/main"]],
                     userRemoteConfigs: [[
-                        url: "https://github.com/Shah-Aaryan/Devops.git",
-                        credentialsId: 'Github-cred'
+                        url: "https://github.com/Shah-Aaryan/Devops.git"
                     ]]
                 ])
             }
