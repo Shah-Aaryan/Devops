@@ -1,4 +1,3 @@
-@Library('Shared') _
 pipeline {
     agent {label 'alisa'}
     
@@ -31,56 +30,85 @@ pipeline {
         
         stage('Git: Code Checkout') {
             steps {
-                script{
-                    code_checkout("https://github.com/Shah-Aaryan/Devops.git","devops")
-                }
+                checkout([$class: 'GitSCM',
+                    branches: [[name: "*/devops"]],
+                    userRemoteConfigs: [[
+                        url: "https://github.com/Shah-Aaryan/Devops.git",
+                        credentialsId: 'Github-cred'
+                    ]]
+                ])
             }
         }
         
         stage("Trivy: Filesystem scan"){
             steps{
-                script{
-                    trivy_scan()
-                }
+                sh '''
+                    trivy fs --exit-code 0 \
+                             --severity HIGH,CRITICAL \
+                             --format table \
+                             -o trivy-fs-report.html \
+                             .
+                '''
             }
         }
 
         
         stage("SonarQube: Code Analysis"){
             steps{
-                script{
-                    sonarqube_analysis("Sonar","playback-space","playback-space")
+                withSonarQubeEnv("Sonar") {
+                    sh """
+                        ${tool('Sonar')}/bin/sonar-scanner \\
+                          -Dsonar.projectKey=playback-space \\
+                          -Dsonar.projectName=playback-space \\
+                          -Dsonar.sources=.
+                    """
                 }
             }
         }
         
         stage("SonarQube: Code Quality Gates"){
             steps{
-                script{
-                    sonarqube_code_quality()
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: false
                 }
             }
         }
         
         stage("Docker: Build Images"){
             steps{
-                script{
-                        dir('backend'){
-                            docker_build("playback-space-backend-beta","${params.BACKEND_DOCKER_TAG}","alisameed")
-                        }
-                    
-                        dir('client'){
-                            docker_build("playback-space-client-beta","${params.CLIENT_DOCKER_TAG}","alisameed")
-                        }
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-cred',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    dir('backend'){
+                        sh """
+                            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                            docker build -t alisameed/playback-space-backend-beta:${params.BACKEND_DOCKER_TAG} .
+                        """
+                    }
+                    dir('client'){
+                        sh """
+                            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                            docker build -t alisameed/playback-space-client-beta:${params.CLIENT_DOCKER_TAG} .
+                        """
+                    }
                 }
             }
         }
         
         stage("Docker: Push to DockerHub"){
             steps{
-                script{
-                    docker_push("playback-space-backend-beta","${params.BACKEND_DOCKER_TAG}","alisameed") 
-                    docker_push("playback-space-client-beta","${params.CLIENT_DOCKER_TAG}","alisameed")
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-cred',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh """
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        docker push alisameed/playback-space-backend-beta:${params.BACKEND_DOCKER_TAG}
+                        docker push alisameed/playback-space-client-beta:${params.CLIENT_DOCKER_TAG}
+                    """
                 }
             }
         }
