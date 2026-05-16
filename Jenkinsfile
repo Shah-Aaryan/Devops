@@ -69,21 +69,6 @@ pipeline {
             }
         }
         
-        stage("Docker: Push to DockerHub"){
-            steps{
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-cred',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-                    sh """
-                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                        docker push alisameed/playback-space-backend-beta:${params.BACKEND_DOCKER_TAG}
-                        docker push alisameed/playback-space-client-beta:${params.CLIENT_DOCKER_TAG}
-                    """
-                }
-            }
-        }
     }
     post{
         success{
