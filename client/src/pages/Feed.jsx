@@ -3,7 +3,6 @@ import axios from '../utils/axios';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import VideoCard from '../components/VideoCard';
 import { Loader2 } from 'lucide-react';
-import{ BASE_URL } from '../constants';
 
 function Feed() {
     const [videos, setVideos] = useState([]);
@@ -20,9 +19,7 @@ function Feed() {
              try {
                 // If query exists, search
                 const queryParam = query ? `?query=${query}` : '';
-const response = await axios.get(`${BASE_URL}videos${queryParam}`, {
-  withCredentials: true
-});
+const response = await axios.get(`videos${queryParam}`);
                 if (response.data.success) {
                     setVideos(response.data.data.videos);
                 }
