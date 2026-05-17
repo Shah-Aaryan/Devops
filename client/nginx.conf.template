@@ -2,6 +2,9 @@ server {
   listen 80;
   server_name _;
 
+  # Allow large video uploads through the proxy
+  client_max_body_size 2g;
+
   root /usr/share/nginx/html;
   index index.html;
 
