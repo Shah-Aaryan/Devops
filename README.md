@@ -1,6 +1,6 @@
 # PlaybackSpace — DevOps on AWS
 
-> Full-stack video platform deployed on AWS with a complete CI/CD, containerisation, and observability stack.
+
 
 ## 🏗️ Tech Stack
 
