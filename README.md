@@ -108,8 +108,3 @@ Jenkins → playback-space-CI → Build with Parameters
 | Client App | `http://<K8S_IP>:31000` |
 | Backend API | `http://<K8S_IP>:31100/api/v1/` |
 
----
-
-## 📖 Full Deployment Guide
-
-See [`aws-deployment-guide.md`](.gemini/antigravity/brain/4dc97e47-e518-418e-b8c9-1556024f2a44/artifacts/aws-deployment-guide.md) for the complete step-by-step walkthrough including architecture diagrams, troubleshooting, and Grafana dashboard IDs.
